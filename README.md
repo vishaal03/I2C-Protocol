@@ -67,9 +67,6 @@ The testbench demonstrates all functional aspects of the bus, including arbitrat
 
 
 
-============================
-I2C Multi-Master Test Complete
-============================
 
 
 
