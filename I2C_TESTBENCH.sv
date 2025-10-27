@@ -172,7 +172,7 @@ module I2C_system_TB();
 
         #300000;
 
-        $display("✅ Simulation Complete.");
+        $display("Simulation Complete.");
         $stop;
     end
 
@@ -191,3 +191,4 @@ module I2C_system_TB();
     end
 
 endmodule
+
