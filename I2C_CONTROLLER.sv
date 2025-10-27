@@ -1,5 +1,4 @@
 
-
 module master_I2C #(
     parameter TLOW  = 250,   // SCL low time (ns or simulation cycles)
     parameter THIGH = 180,   // SCL high time
@@ -213,6 +212,3 @@ module master_I2C #(
     end
 
 endmodule
-
-
-
