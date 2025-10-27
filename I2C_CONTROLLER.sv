@@ -1,10 +1,4 @@
-// -----------------------------------------------------------------------------
-// Title       : master_I2C
-// Description : I2C Master Controller supporting basic Write/Read transactions.
-//               Compatible with multi-master I2C bus using open-drain outputs.
-// Author      : [Your Name]
-// Date        : October 2025
-// -----------------------------------------------------------------------------
+
 
 module master_I2C #(
     parameter TLOW  = 250,   // SCL low time (ns or simulation cycles)
@@ -219,5 +213,6 @@ module master_I2C #(
     end
 
 endmodule
+
 
 
