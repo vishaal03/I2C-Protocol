@@ -1,6 +1,4 @@
-// =============================================================
-// I2C Bus Top-Level Module (SystemVerilog Version)
-// =============================================================
+
 timeunit 1ns;
 timeprecision 1ps;
 
@@ -119,3 +117,4 @@ module I2C_BUS (
     );
 
 endmodule
+
