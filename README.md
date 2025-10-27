@@ -1,101 +1,75 @@
-# I2C-Protocol
+#  Multi-Master Multi-Slave I²C System (3 Masters, 3 Slaves)
+<img width="300" height="304" alt="image" src="https://github.com/user-attachments/assets/9f56671c-7b53-445e-9695-c103f057a844" />
 
-#  I²C Multi-Master and Multi-Slave Communication System 
 
 ---
 
 ##  Overview
 
-This project implements a **complete I²C (Inter-Integrated Circuit)** communication system in **SystemVerilog**, supporting **multiple masters** and **three slave devices**. It includes an **accurate behavioral model** of the I²C protocol compliant with the **Standard Mode (100 kHz)** specification.
+This project implements a **fully functional I²C (Inter-Integrated Circuit) bus system** in **SystemVerilog**, featuring:
 
-The system demonstrates key I²C features such as:
+- **3 Master Controllers**
+- **3 Target (Slave) Devices**
+- **Shared open-drain SCL and SDA lines**
+- **Clock synchronization**
+- **Clock stretching**
+- **Bus arbitration logic**
+- **Multi-controller priority handling**
 
-- Multi-master arbitration  
-- Address-based slave selection  
-- Read and write transactions  
-- Acknowledgment (ACK/NACK) handling  
-- Clock stretching and synchronization  
-- Timing compliance with I²C standard specifications  
-
-The design can be simulated using **ModelSim**, **QuestaSim**, or any **SystemVerilog-compatible simulator**.
-
----
-
-##  System Architecture
-
-###  Components
-
-| Module | Description |
-|--------|-------------|
-| `controller_I2C.sv` | Implements the I²C Master controller logic. Generates start/stop conditions, manages read/write operations, and handles arbitration. |
-| `target_I2C.sv` | Implements an I²C Slave (Target) with a unique 7-bit address. Can send or receive data depending on the master’s request. |
-| `I2C_top.sv` | Top-level file interconnecting multiple masters and three slaves through shared SDA and SCL lines. |
-| `I2C_TB.sv` | Comprehensive SystemVerilog testbench that verifies all functionalities including write/read cycles, address mismatches, and arbitration. |
+The design is modular, scalable, and adheres to I²C protocol standards.  
+It provides an accurate hardware-level model suitable for FPGA or ASIC simulation environments.
 
 ---
 
 ##  Key Features
 
-###  Protocol Compliance
-- Fully compliant with **I²C Standard Mode (100 kHz)** timing requirements.
-- START, STOP, ACK, and NACK conditions implemented per specification.
-
-###  Multi-Master Capability
-- Three independent master controllers can initiate communication.
-- Includes **arbitration** and **clock synchronization** logic.
-
-###  Multi-Slave Support
-- Three slave devices connected to the same SDA/SCL bus.
-- Each has a unique **7-bit address** and independent data buffers.
-
-###  Clock Stretching
-- Implemented on the slave side for simulating slower response conditions.
-- Masters correctly wait until the clock is released.
-
-###  Parameterization
-All important aspects can be easily modified through parameters:
-| Parameter | Description | Default |
-|------------|-------------|----------|
-| `ADDR_TARGET` | 7-bit address of slave | `7'b0000111` |
-| `BYTES_SEND` | Bytes transmitted by slave | `2` |
-| `BYTES_RECEIVE` | Bytes received by slave | `2` |
-| `STRETCH` | Clock stretch duration (in cycles) | `1000` |
-| `THD_STA` | Hold time for START condition | `225` cycles |
-| `TSU_STO` | Set-up time for STOP condition | `225` cycles |
+| Feature | Description |
+|----------|-------------|
+|  **Multi-Master Bus** | Supports 3 controllers operating on a shared I²C bus |
+|  **Multi-Target Interface** | Each target has a unique 7-bit address and data send buffer |
+|  **Clock Stretching** | Slaves can hold SCL low to delay the master when not ready |
+|  **Arbitration** | Ensures fair access when multiple masters initiate communication simultaneously |
+|  **Clock Synchronization** | Masters synchronize SCL lines using open-drain wired-AND logic |
+|  **Open-Drain Behavior** | SDA and SCL lines modeled with `tri1` for realistic bus contention |
+|  **Parameterizable Data Widths** | Easily configurable byte send/receive limits via parameters |
+|  **Readable Structure** | Clean separation of top, controller, and target modules |
+|  **Comprehensive Testbench** | Simulates multiple communication scenarios with timing and arbitration checks |
 
 ---
 
-##  I²C Protocol Background
 
-The **I²C bus** uses two bidirectional open-drain lines:
-
-- **SCL (Serial Clock Line)** — clock provided by master(s).  
-- **SDA (Serial Data Line)** — data line used for sending and receiving bits.
-
-### I²C Bus Conditions:
-- **START (S)**: SDA transitions from HIGH → LOW while SCL is HIGH.
-- **STOP (P)**: SDA transitions from LOW → HIGH while SCL is HIGH.
-- **ACK (A)**: Receiver pulls SDA LOW after each byte received.
-- **NACK (N)**: Receiver leaves SDA HIGH to indicate no acknowledgment.
+Each master and target module connects to the **shared SDA and SCL lines**, modeled as `tri1` for open-drain behavior.  
+If any device drives the line low, it’s seen as `0` on the bus; otherwise, it remains high due to the pull-up effect.
 
 ---
 
-##  Operation Summary
+##  Parameter Configuration
 
-### 1️ Address Phase
-1. The master generates a **START condition**.  
-2. Sends a 7-bit **address** + 1-bit **R/W flag** (`0 = Write`, `1 = Read`).  
-3. The addressed slave acknowledges by pulling **SDA LOW** during the ACK bit.
-
-### 2️ Data Phase
-- If `R/W = 0`: Master sends data bytes to slave.
-- If `R/W = 1`: Slave sends data bytes to master.
-- After each byte, an ACK/NACK is transmitted.
-
-### 3️ Stop Condition
-- Master generates a **STOP condition** to release the bus.
+| Parameter | Default | Description |
+|------------|----------|-------------|
+| `BYTES_SEND_LOG` | `2` | Logarithm of max bytes to send (2 → 3 bytes) |
+| `BYTES_RECEIVE_LOG` | `2` | Logarithm of max bytes to receive (2 → 3 bytes) |
+| `BITS_SEND_MAX` | Derived | `(2**BYTES_SEND_LOG - 1) << 3` = max bits per transaction |
 
 ---
+
+##  Testbench Details
+  
+The testbench demonstrates all functional aspects of the bus, including arbitration and multi-slave communication.
+
+###  Test Phases
+
+| Phase | Description | Involved Masters/Targets |
+|--------|--------------|--------------------------|
+| 1️ | Master 1 sends to Target 1 | M1 → T1 |
+| 2 | Master 2 sends to Target 2 | M2 → T2 |
+| 3 | Masters 1 & 3 start simultaneously (arbitration test) | M1 ↔ M3 competing |
+
+
+
+============================
+I2C Multi-Master Test Complete
+============================
 
 
 
